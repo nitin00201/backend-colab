@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # Node.js application
+  app:
+    build: .
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://root:password@mongo:27017/monolith?authSource=admin
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - INNGEST_SIGNING_KEY=your_production_signing_key
+      # Email configuration (uncomment and configure one option)
+      # Gmail configuration:
+      # - GMAIL_USER=your_gmail@gmail.com
+      # - GMAIL_APP_PASSWORD=your_app_password
+      # Outlook configuration:
+      # - OUTLOOK_USER=your_outlook@outlook.com
+      # - OUTLOOK_PASSWORD=your_password
+      # Custom SMTP configuration:
+      # - SMTP_HOST=your_smtp_host
+      # - SMTP_PORT=587
+      # - SMTP_SECURE=false
+      # - SMTP_USER=your_smtp_user
+      # - SMTP_PASS=your_smtp_password
+    depends_on:
+      - mongo
+      - redis
+    volumes:
+      - ./logs:/app/logs
+      - ./public:/app/public
+    restart: unless-stopped
+
+  # MongoDB database
+  mongo:
+    image: mongo:6-jammy
+    ports:
+      - "27018:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=your_production_password
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+
+  # Redis cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
+  redis_data:

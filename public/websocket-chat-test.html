@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .chat-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+            height: 300px;
+            overflow-y: auto;
+        }
+        .message {
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+        }
+        .message.own {
+            background-color: #e3f2fd;
+            text-align: right;
+        }
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+        .input-container input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .input-container button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .input-container button:hover {
+            background-color: #0056b3;
+        }
+        .status {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+        .status.connected {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status.disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .typing-indicator {
+            font-style: italic;
+            color: #666;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WebSocket Chat Test</h1>
+        
+        <div id="status" class="status disconnected">
+            Disconnected
+        </div>
+        
+        <div id="typingIndicator" class="typing-indicator"></div>
+        
+        <div id="chatContainer" class="chat-container">
+            <div class="message">Welcome to the WebSocket chat test!</div>
+        </div>
+        
+        <div class="input-container">
+            <input type="text" id="messageInput" placeholder="Type your message..." />
+            <button id="sendButton">Send</button>
+            <button id="joinButton">Join Room</button>
+            <button id="disconnectButton">Disconnect</button>
+        </div>
+        
+        <div style="margin-top: 15px;">
+            <input type="text" id="roomIdInput" placeholder="Room ID" value="test-room" />
+            <input type="text" id="userIdInput" placeholder="User ID" value="user-1" />
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        // DOM elements
+        const statusEl = document.getElementById('status');
+        const chatContainerEl = document.getElementById('chatContainer');
+        const messageInputEl = document.getElementById('messageInput');
+        const sendButtonEl = document.getElementById('sendButton');
+        const joinButtonEl = document.getElementById('joinButton');
+        const disconnectButtonEl = document.getElementById('disconnectButton');
+        const roomIdInputEl = document.getElementById('roomIdInput');
+        const userIdInputEl = document.getElementById('userIdInput');
+        const typingIndicatorEl = document.getElementById('typingIndicator');
+        
+        // WebSocket connection
+        let socket = null;
+        let isConnected = false;
+        
+        // Add message to chat
+        function addMessage(message, isOwn = false) {
+            const messageEl = document.createElement('div');
+            messageEl.className = `message ${isOwn ? 'own' : ''}`;
+            messageEl.textContent = message;
+            chatContainerEl.appendChild(messageEl);
+            chatContainerEl.scrollTop = chatContainerEl.scrollHeight;
+        }
+        
+        // Update connection status
+        function updateStatus(message, isConnected) {
+            statusEl.textContent = message;
+            statusEl.className = `status ${isConnected ? 'connected' : 'disconnected'}`;
+        }
+        
+        // Connect to WebSocket
+        function connect() {
+            if (socket) {
+                socket.disconnect();
+            }
+            
+            socket = io('http://localhost:3000');
+            
+            socket.on('connect', () => {
+                isConnected = true;
+                updateStatus('Connected', true);
+                addMessage('Connected to WebSocket server');
+            });
+            
+            socket.on('disconnect', () => {
+                isConnected = false;
+                updateStatus('Disconnected', false);
+                addMessage('Disconnected from WebSocket server');
+            });
+            
+            socket.on('connect_error', (error) => {
+                updateStatus(`Connection error: ${error.message}`, false);
+                addMessage(`Connection error: ${error.message}`);
+            });
+            
+            // Chat message handler
+            socket.on('message', (data) => {
+                const message = `${data.userId}: ${data.message}`;
+                addMessage(message);
+            });
+            
+            // User joined handler
+            socket.on('userJoined', (data) => {
+                addMessage(`${data.userId} joined the room`);
+            });
+            
+            // Typing indicator handler
+            socket.on('typing', (data) => {
+                if (data.isTyping) {
+                    typingIndicatorEl.textContent = `${data.userId} is typing...`;
+                    setTimeout(() => {
+                        typingIndicatorEl.textContent = '';
+                    }, 1000);
+                }
+            });
+        }
+        
+        // Join room
+        function joinRoom() {
+            if (!isConnected) {
+                addMessage('Please connect first');
+                return;
+            }
+            
+            const roomId = roomIdInputEl.value;
+            const userId = userIdInputEl.value;
+            
+            if (!roomId || !userId) {
+                addMessage('Please enter room ID and user ID');
+                return;
+            }
+            
+            socket.emit('join', {
+                userId: userId,
+                roomId: roomId
+            });
+            
+            addMessage(`Joined room: ${roomId}`);
+        }
+        
+        // Send message
+        function sendMessage() {
+            if (!isConnected) {
+                addMessage('Please connect first');
+                return;
+            }
+            
+            const message = messageInputEl.value.trim();
+            const roomId = roomIdInputEl.value;
+            const userId = userIdInputEl.value;
+            
+            if (!message) {
+                return;
+            }
+            
+            socket.emit('message', {
+                roomId: roomId,
+                message: message,
+                userId: userId
+            });
+            
+            addMessage(`${userId}: ${message}`, true);
+            messageInputEl.value = '';
+        }
+        
+        // Send typing indicator
+        function sendTypingIndicator() {
+            if (!isConnected) {
+                return;
+            }
+            
+            const roomId = roomIdInputEl.value;
+            const userId = userIdInputEl.value;
+            
+            socket.emit('typing', {
+                roomId: roomId,
+                userId: userId,
+                isTyping: true
+            });
+        }
+        
+        // Disconnect
+        function disconnect() {
+            if (socket) {
+                socket.disconnect();
+            }
+        }
+        
+        // Event listeners
+        joinButtonEl.addEventListener('click', joinRoom);
+        sendButtonEl.addEventListener('click', sendMessage);
+        disconnectButtonEl.addEventListener('click', disconnect);
+        
+        messageInputEl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+            
+            // Send typing indicator
+            sendTypingIndicator();
+        });
+        
+        // Initialize
+        connect();
+    </script>
+</body>
+</html>
