@@ -22,7 +22,7 @@ router.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
-    version: '1.0.0'
+    service: 'monolith-app-api'
   });
 });
 
@@ -36,10 +36,10 @@ router.get('/profile', authenticate, AuthController.getProfile);
 router.get('/users', authenticate, UserController.getAllUsers);
 router.get('/users/:id', authenticate, UserController.getUserById);
 router.put('/users/:id', authenticate, UserController.updateUser);
-router.delete('/users/:id',  UserController.deleteUser);
+router.delete('/users/:id', UserController.deleteUser);
 router.put('/users/:id/role', UserController.updateUserRole);
 
-// Team routes (legacy for backward compatibility)
+// Team routes
 router.get('/team/members', authenticate, TeamController.getTeamMembers);
 router.put('/team/members/:id', authenticate, TeamController.updateTeamMember);
 router.delete('/team/members/:id', authenticate, TeamController.deleteTeamMember);

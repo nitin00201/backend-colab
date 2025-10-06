@@ -25,19 +25,27 @@ const corsOptions = {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    // List of allowed origins
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://127.0.0.1:3000',
-      'http://127.0.0.1:3001',
-      'https://your-production-domain.com' // Add your production domain here
-    ];
+    // Check if we're in production
+    const isProduction = process.env.NODE_ENV === 'production';
     
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+    // In production, allow all origins (you can restrict this to your domain)
+    if (isProduction) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      // List of allowed origins for development
+      const allowedOrigins = [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:3001',
+        'https://your-production-domain.com' // Add your production domain here
+      ];
+      
+      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
     }
   },
   methods: ['GET','HEAD','PUT','PATCH','POST','DELETE'],
@@ -71,8 +79,7 @@ const demoRoutes = [
   ['/task-document-demo', 'task-document-demo.html'],
   ['/inngest-resend-demo', 'inngest-resend-demo.html'],
   ['/websocket-chat-test', 'websocket-chat-test.html'],
-  ['/document-collaboration-test', 'document-collaboration-test.html'],
-  ['/websocket-test', 'websocket-test.html']
+  ['/document-collaboration-test', 'document-collaboration-test.html']
 ];
 
 demoRoutes.forEach(([route, file]) => {
