@@ -4,7 +4,7 @@ import { createClient } from 'redis';
 import logger from '../utils/logger.js';
 import Message from '../models/Message.js';
 import Chat from '../models/Chat.js';
-import Notification from '../models/Notification.js'; // Import Notification model
+import Notification from '../models/Notification.js';
 
 let websocketService = null;
 let broadcastFunction = null;
@@ -59,7 +59,7 @@ export const initializeWebSocketService = (httpServer) => {
   if (process.env.REDIS_HOST) {
     try {
       redisClient = createClient({
-        url: `http://redis-11031.c11.us-east-1-3.ec2.redns.redis-cloud.com:11031/`,
+        url: `redis://redis-11031.c11.us-east-1-3.ec2.redns.redis-cloud.com:11031`,
         password: process.env.REDIS_PASSWORD || undefined,
         username: process.env.REDIS_USERNAME || 'default',
       });
