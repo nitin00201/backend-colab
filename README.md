@@ -1,6 +1,6 @@
 # Monolith Application
 
-A production-level Node.js monolithic application with JWT authentication, role-based access control, MongoDB, Redis, and Docker support.
+A production-level Node.js monolithic application with JWT authentication, role-based access control, MongoDB, Redis, and Render deployment support.
 
 ## Features
 
@@ -9,7 +9,6 @@ A production-level Node.js monolithic application with JWT authentication, role-
 - User management (CRUD operations)
 - MongoDB for data storage
 - Redis for caching and pub/sub
-- Docker containerization
 - Environment-based configuration
 - Security best practices (Helmet, CORS, Rate limiting)
 - Real-time capabilities with WebSocket
@@ -29,18 +28,12 @@ A production-level Node.js monolithic application with JWT authentication, role-
 
 ## Getting Started
 
-### With Docker (Recommended)
+### Using Render (Recommended)
 
 1. Clone the repository
-2. Choose the appropriate docker-compose file for your environment:
-   - For development: `docker-compose -f docker-compose.dev.yml up -d`
-   - For production: `docker-compose -f docker-compose.prod.yml up -d`
-   - For default configuration: `docker-compose up -d`
-3. Access the application at `http://localhost:3000`
+2. Follow the [Render Deployment Guide](RENDER_DEPLOYMENT.md) for detailed instructions
 
-Note: MongoDB is configured to run on port 27018 to avoid conflicts with local MongoDB instances running on the default port 27017.
-
-### Without Docker (Using MongoDB Atlas and Hosted Redis)
+### Local Development (Using MongoDB Atlas and Hosted Redis)
 
 1. Clone the repository
 2. Run `npm install`
@@ -198,101 +191,9 @@ To use the Postman collection:
 This application includes comprehensive Organization and Teams management APIs. For detailed documentation, see:
 
 - [Organization and Teams API Documentation](ORGANIZATION_TEAMS_API.md)
-- [Organization and Teams Implementation Guide](ORGANIZATION_TEAMS_README.md)
 
-Frontend integration examples:
-- [API Utility Functions](../front/monolith-app/src/lib/organizationTeamsApi.js)
-- [Example React Component](../front/monolith-app/src/components/organization/OrganizationTeamsExample.js)
+## Deployment
 
-## Real-time Capabilities
+For deployment instructions, see:
 
-The application includes WebSocket support for real-time features:
-
-- Real-time chat
-- User presence (who's online)
-- Live updates
-- In-app notifications
-- Collaborative document editing
-- Task board updates
-
-### WebSocket Events
-
-- `join` - Join a room
-- `message` - Send a chat message
-- `typing` - Typing indicator
-- `notification` - Receive notifications
-- `documentUpdate` - Document content update
-- `taskUpdated` - Task status update
-- `userJoined` - User joined a room
-
-## Event-Driven Workflows with Inngest
-
-The application uses Inngest for event-driven background job processing:
-
-### Events
-
-- `task.created` - Triggered when a new task is created
-- `task.updated` - Triggered when a task is updated
-- `task.deleted` - Triggered when a task is deleted
-- `doc.created` - Triggered when a new document is created
-- `doc.updated` - Triggered when a document is updated
-- `doc.deleted` - Triggered when a document is deleted
-- `chat.message` - Triggered when a chat message is sent
-- `email/notification.send` - Triggered to send email notifications
-
-### Background Jobs
-
-- Automatic retry of failed jobs
-- Deadline reminders (1 hour before due date)
-- LLM summarization for large documents
-- Chat message notifications
-- Document update notifications
-
-## Email Notifications
-
-The application uses Nodemailer for sending email notifications:
-
-- Task reminders
-- Document update notifications
-- Chat message notifications
-- General email notifications
-
-## Environment Variables
-
-See [.env.example](.env.example) for all required environment variables.
-
-## Project Structure
-
-```
-src/
-├── config/          # Configuration files
-├── controllers/     # Request handlers
-├── functions/       # Inngest functions
-├── middleware/      # Custom middleware
-├── models/          # Database models
-├── routes/          # API routes
-├── services/        # Business logic
-├── utils/           # Utility functions
-└── server.js        # Application entry point
-```
-
-## Security
-
-- Passwords are hashed using bcrypt
-- JWT tokens for authentication
-- Role-based access control
-- Helmet for HTTP security headers
-- CORS enabled
-- Rate limiting to prevent abuse
-
-## Development
-
-To run the Inngest development server:
-
-```bash
-npm run inngest-dev
-```
-
-## License
-
-MIT
+- [Render Deployment Guide](RENDER_DEPLOYMENT.md)

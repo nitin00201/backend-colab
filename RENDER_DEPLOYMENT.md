@@ -1,6 +1,6 @@
 # Render Deployment Guide
 
-This guide explains how to deploy the Monolith App to Render.
+This guide explains how to deploy the Monolith App to Render using Render's native Node.js environment (not Docker).
 
 ## Prerequisites
 
@@ -55,14 +55,14 @@ INNGEST_SIGNING_KEY=your_inngest_signing_key
 ### 3. Deploy
 
 1. Click "Create Web Service"
-2. Render will automatically build and deploy your application
+2. Render will automatically build and deploy your application using Node.js
 3. The deployment process may take a few minutes
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Buildkit Connectivity Error**: This is a Render-specific issue. Make sure your Dockerfile is using the correct syntax and doesn't require buildkit features.
+1. **Build Failures**: Make sure all dependencies in package.json are correctly specified and available.
 
 2. **CORS Issues**: In production, the application allows all origins. If you want to restrict this, modify the CORS configuration in `src/server.js`.
 
