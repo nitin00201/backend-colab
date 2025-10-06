@@ -1,0 +1,89 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18.x
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+
+    - name: Install dependencies
+      run: npm ci
+      working-directory: backend
+
+    - name: Run tests
+      run: npm test
+      working-directory: backend
+      env:
+        NODE_ENV: test
+        MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        REDIS_HOST: ${{ secrets.REDIS_HOST }}
+        REDIS_PORT: ${{ secrets.REDIS_PORT }}
+        REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+
+    - name: Deploy to Staging
+      run: |
+        echo "Deploying to staging environment"
+        # Add your staging deployment commands here
+        # For example, if deploying to a remote server:
+        # ssh ${{ secrets.STAGING_SSH_USER }}@${{ secrets.STAGING_SERVER }} "
+        #   cd /path/to/your/app &&
+        #   git pull origin main &&
+        #   npm ci &&
+        #   pm2 restart your-app-name
+        # "
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    environment: production
+    needs: deploy-staging
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18.x
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+
+    - name: Install dependencies
+      run: npm ci
+      working-directory: backend
+
+    - name: Run tests
+      run: npm test
+      working-directory: backend
+      env:
+        NODE_ENV: test
+        MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        REDIS_HOST: ${{ secrets.REDIS_HOST }}
+        REDIS_PORT: ${{ secrets.REDIS_PORT }}
+        REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+
+    - name: Deploy to Production
+      run: |
+        echo "Deploying to production environment"
+        # Add your production deployment commands here
+        # For example:
+        # ssh ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SERVER }} "
+        #   cd /path/to/your/app &&
+        #   git pull origin main &&
+        #   npm ci &&
+        #   pm2 restart your-app-name
+        # "

@@ -59,8 +59,9 @@ export const initializeWebSocketService = (httpServer) => {
   if (process.env.REDIS_HOST) {
     try {
       redisClient = createClient({
-        url: `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || 6379}`,
-        password: process.env.REDIS_PASSWORD || undefined
+        url: `http://redis-11031.c11.us-east-1-3.ec2.redns.redis-cloud.com:11031/`,
+        password: process.env.REDIS_PASSWORD || undefined,
+        username: process.env.REDIS_USERNAME || 'default',
       });
 
       redisSubscriber = redisClient.duplicate();

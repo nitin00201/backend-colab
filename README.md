@@ -24,9 +24,8 @@ A production-level Node.js monolithic application with JWT authentication, role-
 ## Prerequisites
 
 - Node.js 16+
-- Docker and Docker Compose
-- MongoDB (if running without Docker)
-- Redis (if running without Docker)
+- MongoDB Atlas account (or local MongoDB)
+- Redis instance (hosted or local)
 
 ## Getting Started
 
@@ -41,13 +40,32 @@ A production-level Node.js monolithic application with JWT authentication, role-
 
 Note: MongoDB is configured to run on port 27018 to avoid conflicts with local MongoDB instances running on the default port 27017.
 
-### Without Docker
+### Without Docker (Using MongoDB Atlas and Hosted Redis)
 
 1. Clone the repository
 2. Run `npm install`
-3. Set up MongoDB and Redis
-4. Configure environment variables in `.env`
+3. Set up MongoDB Atlas and configure environment variables in `.env`
+4. Set up a hosted Redis service and configure environment variables in `.env`
 5. Run `npm start`
+
+## Redis Testing
+
+This application includes comprehensive Redis testing capabilities:
+
+- **Basic Redis Connection Test**: Verifies connectivity and basic operations
+- **Notification Service Redis Test**: Tests Redis operations specific to notifications
+- **Integration Tests**: Tests NotificationService with MongoDB
+
+For detailed information about Redis testing, see [REDIS_TESTING.md](REDIS_TESTING.md).
+
+## CI/CD Setup
+
+This project includes GitHub Actions workflows for Continuous Integration and Deployment without Docker:
+
+- **CI Pipeline**: Runs tests on every push/PR using your MongoDB Atlas and hosted Redis instances
+- **Deploy Pipeline**: Deploys to staging and production environments
+
+For detailed information about the CI/CD setup, see [CI_CD_SETUP.md](CI_CD_SETUP.md).
 
 ## API Endpoints
 

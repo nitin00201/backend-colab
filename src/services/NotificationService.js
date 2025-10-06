@@ -14,6 +14,7 @@ const initializeNotificationService = () => {
   
   // Initialize Redis client
   const redisClient = redis.createClient({
+    username: process.env.REDIS_USERNAME || 'default',
     host: process.env.REDIS_HOST || 'localhost',
     port: process.env.REDIS_PORT || 6379,
     password: process.env.REDIS_PASSWORD || ''

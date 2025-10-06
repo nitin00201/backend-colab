@@ -3,7 +3,7 @@ const config = {
   port: process.env.PORT || 3000,
   env: process.env.NODE_ENV || 'development',
   mongodb: {
-    uri: process.env.MONGODB_URI || 'mongodb://root:password@localhost:27018/monolith?authSource=admin',
+    uri: process.env.MONGODB_URI ,
     user: process.env.MONGO_USER || '',
     password: process.env.MONGO_PASSWORD || '',
   },
