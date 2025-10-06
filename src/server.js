@@ -38,7 +38,7 @@ const corsOptions = {
         'http://localhost:3001',
         'http://127.0.0.1:3000',
         'http://127.0.0.1:3001',
-        'https://your-production-domain.com' // Add your production domain here
+        'https://frontend-colab.vercel.app' // Add your production domain here
       ];
       
       if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
